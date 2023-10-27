@@ -25,13 +25,14 @@ public class CreditServiceTest {
     private CreditService creditService;
 
     @Mock
-    private CreditDAOImpl creditDao;
+    private CreditDAOImpl creditDAOImpl;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         creditService = new CreditService();
-        creditService.setCreditDAOImpl(creditDao);
+
+        creditService = new CreditService(creditDAOImpl);
     }
 
     @Test
