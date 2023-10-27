@@ -2,85 +2,82 @@ package com.bank.Service;
 
 
 import com.bank.DAO.CreditDAOImpl;
-import com.bank.Entity.Agency;
-import com.bank.Entity.Client;
 import com.bank.Entity.Credit;
-import com.bank.Entity.Employee;
 import com.bank.Enum.CreditStatus;
-import com.bank.Service.AgencyService;
-import com.bank.Service.ClientService;
 import com.bank.Service.CreditService;
-import com.bank.Service.EmployeeService;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@ApplicationScoped
-class CreditDAOImplTest {
+public class CreditServiceTest {
 
-    @InjectMocks
     private CreditService creditService;
 
     @Mock
-    private EntityManager entityManager;
+    private CreditDAOImpl creditDao;
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.initMocks(this);
+        creditService = new CreditService();
+        creditService.setCreditDAOImpl(creditDao);
     }
 
     @Test
-    void createCredit() throws Exception {
+    public void testAddCredit() throws Exception {
         Credit credit = new Credit();
-        Agency agency = new Agency();
-        agency.setCode("agency1");
-        Client client = new Client();
-        client.setCode(5);
-        Employee employee = new Employee();
-        employee.setRegistrationNbr(1);
-
-        credit.setValue(555);
+        credit.setValue(1000);
         credit.setStatus(CreditStatus.PENDING);
-        credit.setDuration(25);
-        credit.setRemark("Remark");
+        when(creditDao.create(credit)).thenReturn(Optional.of(credit));
 
-        credit.setAgency(agency);
-        credit.setClient(client);
-        credit.setEmployee(employee);
-        credit.setModification_date(LocalDate.parse("2020-02-20"));
-        credit.setModification_time(LocalTime.parse("11:11:11"));
-
-        when(entityManager.persist(any(Credit.class))).thenReturn(credit);
-
-        Optional<Credit> result = creditService.addCredit(credit);
-
-        assertEquals(credit, result.orElse(null));
+        Credit result = creditService.addCredit(credit);
+        assertEquals(1000, result.getValue());
+        assertEquals(CreditStatus.PENDING, result.getStatus());
     }
 
     @Test
-    void updateCredit() {
+    public void testUpdateStatus() throws Exception {
+        int creditId = 1;
+        CreditStatus newStatus = CreditStatus.ACCEPTED;
         Credit credit = new Credit();
+        credit.setId(creditId);
         credit.setStatus(CreditStatus.PENDING);
-        CreditStatus newStatus = CreditStatus.REFUSED;
-        when(entityManager.find(Credit.class, 30)).thenReturn(credit);
 
-        Optional<Credit> result = creditService.updateStatus(30, newStatus);
+        when(creditDao.updateStatus(creditId, newStatus)).thenReturn(Optional.of(credit));
 
-        assertTrue(result.isPresent());
-        assertEquals(newStatus, result.get().getStatus());
+        Credit result = creditService.updateStatus(creditId, newStatus);
+        assertEquals(creditId, result.getId());
+        assertEquals(CreditStatus.ACCEPTED, result.getStatus());
+    }
+
+    @Test
+    public void testFindByDate() throws Exception {
+        LocalDate date = LocalDate.now();
+        List<Credit> credits = new ArrayList<>();
+        when(creditDao.findByDate(date)).thenReturn(credits);
+
+        List<Credit> result = creditService.findByDate(date);
+        assertEquals(credits, result);
+    }
+
+    @Test
+    public void testFindByStatus() throws Exception {
+        String status = "PENDING";
+        List<Credit> credits = new ArrayList<>();
+        when(creditDao.findByStatus(status)).thenReturn(credits);
+
+        List<Credit> result = creditService.findByStatus(status);
+        assertEquals(credits, result);
     }
 }
-
