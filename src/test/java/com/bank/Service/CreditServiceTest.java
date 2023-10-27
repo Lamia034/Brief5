@@ -30,17 +30,17 @@ public class CreditServiceTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        creditService = new CreditService();
-
-        creditService = new CreditService(creditDAOImpl);
+        creditService = new CreditService(); 
+        creditService.setCreditDao(creditDAOImpl);
     }
+
 
     @Test
     public void testAddCredit() throws Exception {
         Credit credit = new Credit();
         credit.setValue(1000);
         credit.setStatus(CreditStatus.PENDING);
-        when(creditDao.create(credit)).thenReturn(Optional.of(credit));
+        when(creditDAOImpl.create(credit)).thenReturn(Optional.of(credit));
 
         Credit result = creditService.addCredit(credit);
         assertEquals(1000, result.getValue());
@@ -55,7 +55,7 @@ public class CreditServiceTest {
         credit.setId(creditId);
         credit.setStatus(CreditStatus.PENDING);
 
-        when(creditDao.updateStatus(creditId, newStatus)).thenReturn(Optional.of(credit));
+        when(creditDAOImpl.updateStatus(creditId, newStatus)).thenReturn(Optional.of(credit));
 
         Credit result = creditService.updateStatus(creditId, newStatus);
         assertEquals(creditId, result.getId());
@@ -66,7 +66,7 @@ public class CreditServiceTest {
     public void testFindByDate() throws Exception {
         LocalDate date = LocalDate.now();
         List<Credit> credits = new ArrayList<>();
-        when(creditDao.findByDate(date)).thenReturn(credits);
+        when(creditDAOImpl.findByDate(date)).thenReturn(credits);
 
         List<Credit> result = creditService.findByDate(date);
         assertEquals(credits, result);
@@ -76,7 +76,7 @@ public class CreditServiceTest {
     public void testFindByStatus() throws Exception {
         String status = "PENDING";
         List<Credit> credits = new ArrayList<>();
-        when(creditDao.findByStatus(status)).thenReturn(credits);
+        when(creditDAOImpl.findByStatus(status)).thenReturn(credits);
 
         List<Credit> result = creditService.findByStatus(status);
         assertEquals(credits, result);

@@ -68,4 +68,8 @@ public class CreditService {
         return credits;
 
     }
+
+    public void setCreditDao(CreditDAOImpl creditDAOImpl) {
+        this.creditDao = creditDao;
+    }
 }
