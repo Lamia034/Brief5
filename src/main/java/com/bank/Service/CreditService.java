@@ -15,12 +15,10 @@ public class CreditService {
     private CreditDAOImpl creditDao;
 
 
- //   private CreditDAOImpl creditDao;
-
-//    @Inject
-//    public CreditService(CreditDAOImpl creditDao) {
-//        this.creditDao = creditDao;
-//    }
+    @Inject
+    public CreditService(CreditDAOImpl creditDao) {
+        this.creditDao = creditDao;
+    }
 
 
     public double makeSimulation(int value, int n) throws Exception{
